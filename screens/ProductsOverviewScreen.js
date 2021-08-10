@@ -17,6 +17,14 @@ const ProductsOverviewScreen = props => {
             title={itemData.item.title}
             price={itemData.item.price}
             imageUrl={itemData.item.imageUrl}
+            onViewDetails={() => props.navigation.navigate(
+              {
+                routeName: 'ProductDetails',
+                params: {
+                  productId: itemData.item.id,
+                  productTitle: itemData.item.title
+                }
+              })}
           />}
       />
     </View>
