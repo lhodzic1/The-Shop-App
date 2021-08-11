@@ -6,8 +6,6 @@ class Order {
         this.items = items;
         this.totalAmount = totalAmount;
         this.date = date;
-
-        console.log(this.id + " " + this.items + " " + this.totalAmount + " " + this.date);
     }
 
     get readableDate() {
