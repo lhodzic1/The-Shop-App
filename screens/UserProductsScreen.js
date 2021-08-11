@@ -13,6 +13,15 @@ const UserProductsScreen = props => {
 
   const dispatch = useDispatch();
 
+  const editProductHandler = id => {
+    props.navigation.navigate({
+      routeName: 'EditProduct',
+      params: {
+        productId: id
+      }
+    });
+  };
+
   return (
     <FlatList
       data={userProducts}
@@ -22,12 +31,12 @@ const UserProductsScreen = props => {
           title={itemData.item.title}
           price={itemData.item.price}
           imageUrl={itemData.item.imageUrl}
-          onSelect={() => { }}
+          onSelect={() => editProductHandler(itemData.item.id)}
         >
           <Button
             color={Colors.primary}
             title="Edit"
-            onPress={() => { }}>
+            onPress={() => editProductHandler(itemData.item.id)}>
 
           </Button>
           <Button
@@ -41,9 +50,6 @@ const UserProductsScreen = props => {
   );
 }
 
-const styles = StyleSheet.create({
-});
-
 UserProductsScreen.navigationOptions = navData => {
   return {
     headerTitle: 'Your Products',
@@ -54,7 +60,15 @@ UserProductsScreen.navigationOptions = navData => {
         onPress={() => {
           navData.navigation.toggleDrawer();
         }} />
-    </HeaderButtons>
+    </HeaderButtons>,
+    headerRight: () => <HeaderButtons HeaderButtonComponent={HeaderButton}>
+    <Item
+      title='Add'
+      iconName={Platform.OS === 'android' ? 'md-create' : 'ios-create'}
+      onPress={() => {
+        navData.navigation.navigate('EditProduct');
+      }} />
+  </HeaderButtons>
   }
 };
 
