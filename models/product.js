@@ -6,8 +6,6 @@ class Product {
         this.imageUrl = imageUrl;
         this.description = description;
         this.price = price;
-
-        console.log(id + " " + ownerId + " " + title + " " + imageUrl + " " + description + " " + price)
     }
 }
 
