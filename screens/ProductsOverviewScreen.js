@@ -15,7 +15,7 @@ const ProductsOverviewScreen = props => {
   const products = useSelector(state => state.products.availableProducts);
   const dispatch = useDispatch();
 
-  const loadProducts = useCallback( async () => {
+  const loadProducts = useCallback(async () => {
     setError(null);
     setIsLoading(true);
     try {
@@ -26,6 +26,17 @@ const ProductsOverviewScreen = props => {
     setIsLoading(false);
   }, [dispatch, setIsLoading, setError]);
 
+  //re-fetching the products
+  useEffect(() => {
+    const willFocusSub = props.navigation.addListener('willFocus', loadProducts);
+
+    //clean-up function
+    return () => {
+      willFocusSub.remove();
+    }
+  }, [loadProducts]);
+
+  //fetching the products initially
   useEffect(() => {
     loadProducts();
   }, [dispatch, loadProducts]);
@@ -45,7 +56,7 @@ const ProductsOverviewScreen = props => {
     return (
       <View style={styles.centerd}>
         <Text>An error occured: {error}</Text>
-        <Button title='Try again' onPress={loadProducts} color={Colors.primary}/>
+        <Button title='Try again' onPress={loadProducts} color={Colors.primary} />
       </View>
     );
   };
