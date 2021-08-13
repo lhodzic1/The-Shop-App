@@ -1,16 +1,34 @@
-import React from 'react';
-import { StyleSheet, View, FlatList, Button } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { StyleSheet, View, FlatList, Button, ActivityIndicator, Text } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 
 import ProductItem from '../components/ProductItem';
 import * as cartActions from '../store/actions/cart';
+import * as productsActions from '../store/actions/products'
 import HeaderButton from '../components/UI/HeaderButton';
 import Colors from '../constants/Colors';
 
 const ProductsOverviewScreen = props => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState();
   const products = useSelector(state => state.products.availableProducts);
   const dispatch = useDispatch();
+
+  const loadProducts = useCallback( async () => {
+    setError(null);
+    setIsLoading(true);
+    try {
+      await dispatch(productsActions.fetchProducts());
+    } catch (err) {
+      setError(err.message);
+    }
+    setIsLoading(false);
+  }, [dispatch, setIsLoading, setError]);
+
+  useEffect(() => {
+    loadProducts();
+  }, [dispatch, loadProducts]);
 
   const selectItemHandler = (id, title) => {
     props.navigation.navigate(
@@ -21,6 +39,33 @@ const ProductsOverviewScreen = props => {
           productTitle: title
         }
       })
+  };
+
+  if (error) {
+    return (
+      <View style={styles.centerd}>
+        <Text>An error occured: {error}</Text>
+        <Button title='Try again' onPress={loadProducts} color={Colors.primary}/>
+      </View>
+    );
+  };
+
+  if (isLoading) {
+    return (
+      <View style={styles.centerd}>
+        <ActivityIndicator
+          size='large'
+          color={Colors.accent} />
+      </View>
+    );
+  };
+
+  if (!isLoading && products.length === 0) {
+    return (
+      <View style={styles.centerd}>
+        <Text>No products found</Text>
+      </View>
+    );
   };
 
   return (
@@ -56,11 +101,10 @@ const ProductsOverviewScreen = props => {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  centerd: {
     flex: 1,
-    backgroundColor: '#fff',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'center'
   },
 });
 
