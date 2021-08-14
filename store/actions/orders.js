@@ -1,4 +1,36 @@
+import Order from '../../models/order';
+
 export const ADD_ORDER = 'ADD_ORDER';
+export const SET_ORDERS = 'SET_ORDERS';
+
+export const fetchOrders = () => {
+    return async dispatch => {
+
+        try {
+            const response = await fetch('https://rn-complete-guide-8af80-default-rtdb.firebaseio.com/orders/u1.json');
+
+            if (!response.ok) {
+                throw new Error('Something went wrong!');
+            }
+
+            const responseData = await response.json();
+            const loadedOrders = [];
+
+            for (const key in responseData) {
+                loadedOrders.push(new Order(
+                    key,
+                    responseData[key].cartItems,
+                    responseData[key].totalAmount,
+                    new Date(responseData[key].date)
+                ));
+            };
+
+            dispatch({ type: SET_ORDERS, orders: loadedOrders });
+        } catch (error) {
+            throw error;
+        }
+    };
+};
 
 export const addOrder = (cartItems, totalAmount) => {
     return async dispatch => {
@@ -33,5 +65,4 @@ export const addOrder = (cartItems, totalAmount) => {
             }
         });
     };
-
 };
