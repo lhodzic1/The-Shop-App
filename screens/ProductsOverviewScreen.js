@@ -88,7 +88,7 @@ const ProductsOverviewScreen = props => {
         data={products}
         keyExtractor={item => item.id}
         onRefresh={loadProducts}
-        refreshing={isRefreshing}
+        refreshing={isRefreshingv}
         renderItem={itemData =>
           <ProductItem
             title={itemData.item.title}
