@@ -1,12 +1,71 @@
-import React from 'react';
+import React, { useReducer, useCallback } from 'react';
 import { View, StyleSheet, ScrollView, Button } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useDispatch } from 'react-redux';
 
 import Card from '../components/UI/Card';
 import Input from '../components/UI/Input';
 import Colors from '../constants/Colors';
+import * as authActions from '../store/actions/auth';
+
+const fromReducer = (state, action) => {
+    if (action.type === 'UPDATE') {
+        const updatedValues = {
+            ...state.inputValues,
+            [action.input]: action.value
+        };
+
+        const updatedValidities = {
+            ...state.inputValidities,
+            [action.input]: action.isValid
+        };
+
+        let updatedformIsValid = true;
+        for (const key in updatedValidities) {
+            updatedformIsValid = updatedformIsValid && updatedValidities[key];
+        };
+
+        return {
+            formIsValid: updatedformIsValid,
+            inputValues: updatedValues,
+            inputValidities: updatedValidities
+        };
+    }
+
+    return state;
+};
 
 const AuthScreen = props => {
+    const [formState, dispatchFormState] = useReducer(fromReducer,
+        {
+            inputValues: {
+                email: '',
+                password: ''
+            },
+            inputValidities: {
+                email: false,
+                password: false
+            },
+            formIsValid: false
+        });
+
+    const inputChangeHandler = useCallback((inputIdentifier, inputValue, inputValidity) => {
+        dispatchFormState({
+            type: 'UPDATE',
+            value: inputValue,
+            isValid: inputValidity,
+            input: inputIdentifier
+        });
+    }, [dispatchFormState]);
+
+    const dispatch = useDispatch();
+
+    const signUpHandler = () => {
+        dispatch(authActions.signup(formState.inputValues.email, formState.inputValues.password));
+    };
+
+
+
     return (
         <View style={styles.screen}>
             <LinearGradient colors={['#ffedff', '#ffe3ff']} style={styles.gradient}>
@@ -18,8 +77,8 @@ const AuthScreen = props => {
                             required
                             email
                             autoCapitalize="none"
-                            errorMessage="Please enter a valid email adress"
-                            onInputChange={() => { }}
+                            errorText="Please enter a valid email adress"
+                            onInputChange={inputChangeHandler}
                             initialValue="" />
                         <Input
                             id="password"
@@ -28,11 +87,11 @@ const AuthScreen = props => {
                             required
                             minLength={5}
                             autoCapitalize="none"
-                            errorMessage="Please enter a valid password"
-                            onInputChange={() => { }}
+                            errorText="Please enter a valid password"
+                            onInputChange={inputChangeHandler}
                             initialValue="" />
                         <View style={styles.buttonContainer}>
-                            <Button title="Login" color={Colors.primary} onPress={() => { }} />
+                            <Button title="Login" color={Colors.primary} onPress={signUpHandler} />
                         </View>
                         <View style={styles.buttonContainer}>
                             <Button title="Switch to Sign Up" color={Colors.accent} onPress={() => { }} />
